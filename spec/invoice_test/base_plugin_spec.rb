@@ -2,9 +2,19 @@ require 'spec_helper'
 require 'logger'
 
 describe InvoiceTest::InvoicePlugin do
-  before(:each) do
 
-    kb_apis         = Killbill::Plugin::KillbillApi.new('killbill-invoice-test', {})
+  class FakeJavaInvoiceUserApi
+    attr_accessor :invoices
+
+    def get_invoices_by_account(accountId, context)
+      @invoices
+    end
+  end
+
+  before(:each) do
+    @invoice_api = FakeJavaInvoiceUserApi.new
+    kb_apis      = Killbill::Plugin::KillbillApi.new('killbill-invoice-test', {:invoice_user_api => @invoice_api})
+
     @plugin         = InvoiceTest::InvoicePlugin.new
     @plugin.logger  = Logger.new(STDOUT)
     @plugin.kb_apis = kb_apis
