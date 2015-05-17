@@ -1,5 +1,5 @@
 killbill-invoice-test-plugin
-==============================
+============================
 
 Plugin to test the Kill Bill InvoicePlugin API.
 
