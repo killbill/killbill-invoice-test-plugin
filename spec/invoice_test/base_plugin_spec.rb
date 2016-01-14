@@ -33,7 +33,7 @@ describe InvoiceTest::InvoicePlugin do
     recurring_item = build_invoice_item(150, :RECURRING)
     invoice        = build_invoice([fixed_item, recurring_item])
 
-    new_items = @plugin.get_additional_invoice_items(invoice, @properties, @call_context)
+    new_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
     new_items.size.should == 2
 
     check_invoice_item(new_items[0], 7, fixed_item)
@@ -49,7 +49,7 @@ describe InvoiceTest::InvoicePlugin do
     fixed_adj_item     = build_invoice_item(-100, :ITEM_ADJ, fixed_item.id)
     invoice            = build_invoice([fixed_item, recurring_item, recurring_adj_item, fixed_adj_item])
 
-    new_items = @plugin.get_additional_invoice_items(invoice, @properties, @call_context)
+    new_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
     new_items.size.should == 0
 
     check_idempotency(invoice, new_items)
@@ -61,7 +61,7 @@ describe InvoiceTest::InvoicePlugin do
     fixed_adj_item = build_invoice_item(-100, :ITEM_ADJ, fixed_item.id)
     invoice        = build_invoice([fixed_item, recurring_item, fixed_adj_item])
 
-    new_items = @plugin.get_additional_invoice_items(invoice, @properties, @call_context)
+    new_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
     new_items.size.should == 1
 
     check_invoice_item(new_items[0], 10.5, recurring_item)
@@ -75,7 +75,7 @@ describe InvoiceTest::InvoicePlugin do
     fixed_adj_item = build_invoice_item(-20, :ITEM_ADJ, fixed_item.id)
     invoice        = build_invoice([fixed_item, tax_item, fixed_adj_item])
 
-    new_items = @plugin.get_additional_invoice_items(invoice, @properties, @call_context)
+    new_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
     new_items.size.should == 1
 
     check_invoice_item(new_items[0], -1.4, tax_item, :ITEM_ADJ)
@@ -110,7 +110,7 @@ describe InvoiceTest::InvoicePlugin do
 
   def check_idempotency(original_invoice, new_items)
     invoice          = build_invoice(original_invoice.invoice_items + new_items)
-    additional_items = @plugin.get_additional_invoice_items(invoice, @properties, @call_context)
+    additional_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
     additional_items.size.should == 0
   end
 end

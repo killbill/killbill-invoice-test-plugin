@@ -4,7 +4,7 @@ module InvoiceTest
 
     # This implementation is idempotent, will apply tax on old invoices if needed
     # and automatically handle adjustments
-    def get_additional_invoice_items(new_invoice, properties, context)
+    def get_additional_invoice_items(new_invoice, dry_run, properties, context)
       all_invoices = @kb_apis.invoice_user_api.get_invoices_by_account(new_invoice.account_id, context)
       # Workaround for https://github.com/killbill/killbill/issues/265
       all_invoices << new_invoice unless all_invoices.find { |inv| inv.id == new_invoice.id }
