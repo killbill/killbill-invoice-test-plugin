@@ -6,7 +6,7 @@ describe InvoiceTest::InvoicePlugin do
   class FakeJavaInvoiceUserApi
     attr_accessor :invoices
 
-    def get_invoices_by_account(accountId, context)
+    def get_invoices_by_account(accountId, includesMigrated, context)
       @invoices
     end
   end
