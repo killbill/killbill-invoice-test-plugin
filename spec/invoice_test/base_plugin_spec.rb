@@ -6,7 +6,7 @@ describe InvoiceTest::InvoicePlugin do
   class FakeJavaInvoiceUserApi
     attr_accessor :invoices
 
-    def get_invoices_by_account(accountId, includesMigrated, context)
+    def get_invoices_by_account(accountId, includesMigrated, includeVoidedInvoices, context)
       @invoices
     end
   end
@@ -34,7 +34,7 @@ describe InvoiceTest::InvoicePlugin do
     invoice        = build_invoice([fixed_item, recurring_item])
 
     new_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
-    new_items.size.should == 2
+    expect(new_items.size).to be == 2
 
     check_invoice_item(new_items[0], 7, fixed_item)
     check_invoice_item(new_items[1], 10.5, recurring_item)
@@ -50,7 +50,7 @@ describe InvoiceTest::InvoicePlugin do
     invoice            = build_invoice([fixed_item, recurring_item, recurring_adj_item, fixed_adj_item])
 
     new_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
-    new_items.size.should == 0
+    expect(new_items.size).to be == 0
 
     check_idempotency(invoice, new_items)
   end
@@ -62,7 +62,7 @@ describe InvoiceTest::InvoicePlugin do
     invoice        = build_invoice([fixed_item, recurring_item, fixed_adj_item])
 
     new_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
-    new_items.size.should == 1
+    expect(new_items.size).to be == 1
 
     check_invoice_item(new_items[0], 10.5, recurring_item)
 
@@ -76,7 +76,7 @@ describe InvoiceTest::InvoicePlugin do
     invoice        = build_invoice([fixed_item, tax_item, fixed_adj_item])
 
     new_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
-    new_items.size.should == 1
+    expect(new_items.size).to be == 1
 
     check_invoice_item(new_items[0], -1.4, tax_item, :ITEM_ADJ)
 
@@ -92,7 +92,7 @@ describe InvoiceTest::InvoicePlugin do
     invoice
   end
 
-  def build_invoice_item(amount, invoice_item_type=:FIXED, linked_item_id=nil)
+  def build_invoice_item(amount, invoice_item_type = :FIXED, linked_item_id = nil)
     item                   = Killbill::Plugin::Model::InvoiceItem.new
     item.id                = SecureRandom.uuid
     item.amount            = amount
@@ -101,16 +101,16 @@ describe InvoiceTest::InvoicePlugin do
     item
   end
 
-  def check_invoice_item(item, amount, original_item, invoice_item_type=:TAX)
-    item.should be_an_instance_of Killbill::Plugin::Model::InvoiceItem
-    item.amount.should == amount
-    item.invoice_item_type.should == invoice_item_type
-    item.linked_item_id.should == original_item.id
+  def check_invoice_item(item, amount, original_item, invoice_item_type = :TAX)
+    expect(item).to be_an_instance_of(Killbill::Plugin::Model::InvoiceItem)
+    expect(item.amount).to be == amount
+    expect(item.invoice_item_type).to equal(invoice_item_type)
+    expect(item.linked_item_id).to equal(original_item.id)
   end
 
   def check_idempotency(original_invoice, new_items)
     invoice          = build_invoice(original_invoice.invoice_items + new_items)
     additional_items = @plugin.get_additional_invoice_items(invoice, false, @properties, @call_context)
-    additional_items.size.should == 0
+    expect(additional_items.size).to be == 0
   end
 end
