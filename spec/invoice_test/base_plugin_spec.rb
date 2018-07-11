@@ -7,7 +7,6 @@ describe InvoiceTest::InvoicePlugin do
     attr_accessor :invoices
 
     def get_invoices_by_account(accountId, includesMigrated, includeVoidedInvoices, context)
-      puts 'get_invoices_by_account'
       @invoices
     end
   end
